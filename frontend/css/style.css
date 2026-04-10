@@ -1,0 +1,46 @@
+body {
+    background-color: EAEFEF;
+}
+
+.gradient-background {
+    background: linear-gradient(300deg, #005461, #018790, #00B7B5);
+    background-size: 180% 180%;
+    animation: gradient-animation 18s ease infinite;
+}
+
+.logo {
+    height: 8rem;
+    width: 8rem;
+}
+
+
+.start-img {
+    height: 50vh;
+    object-fit: cover;
+    width: 100%;
+}
+
+.btn-primary {
+    background-color: #28a745;
+    border-color: #28a745;
+}
+
+.qualifikation {
+    background-color: #EAEFEF;
+}
+
+.img-leistung {
+    width: 100%;
+    height: 50vh;
+    object-fit: cover;
+}
+
+.h3 {
+    color: azure;
+
+}
+
+.nav-link {
+    color: #EAEFEF;
+    font-size: 3rem;
+}
