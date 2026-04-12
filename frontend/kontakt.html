@@ -99,12 +99,13 @@
 
           <!-- Rechts: Formular -->
           <div class="col-md-8">
-            <form>
+            <form id="kontaktForm">
               <div class="row g-3">
                 <!-- Name & Telefon -->
                 <div class="col-md-6">
                   <input
                     type="text"
+                    id="name"
                     class="form-control"
                     placeholder="Name*"
                     required
@@ -113,6 +114,7 @@
                 <div class="col-md-6">
                   <input
                     type="tel"
+                    id="telefon"
                     class="form-control"
                     placeholder="Telefonnummer"
                   />
@@ -121,13 +123,14 @@
                 <div class="col-md-6">
                   <input
                     type="email"
+                    id="email"
                     class="form-control"
                     placeholder="E-Mail Adresse*"
                     required
                   />
                 </div>
                 <div class="col-md-6">
-                  <select class="form-select">
+                  <select id="leistung" class="form-select">
                     <option selected disabled>Beratungsleistung</option>
                     <option>Büroreinigung</option>
                     <option>Haushaltsreinigung</option>
@@ -138,6 +141,7 @@
                 <div class="col-12">
                   <textarea
                     class="form-control"
+                    id="nachricht"
                     rows="8"
                     placeholder="Ihre Nachricht"
                   ></textarea>
