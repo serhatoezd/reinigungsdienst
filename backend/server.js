@@ -12,7 +12,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Transporter                                // NEU
+// Transporter
 const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
@@ -35,7 +35,12 @@ app.post("/api/kontakt", async (req, res) => {
 
   try {
     await db.query(sql, [name, telefon, email, leistung, nachricht]);
+  } catch (err) {
+    console.error("DB Fehler:", err);
+    return res.status(500).json({ message: "Fehler beim Speichern" });
+  }
 
+  try {
     await transporter.sendMail({
       from: process.env.MAIL_USER,
       to: process.env.MAIL_TO,
@@ -48,12 +53,12 @@ Leistung: ${leistung}
 Nachricht: ${nachricht}
       `,
     });
-
-    res.status(200).json({ message: "Nachricht erfolgreich gesendet!" });
   } catch (err) {
-    console.log("Fehler:", err);
-    res.status(500).json({ message: "Fehler beim Speichern" });
+    console.error("Mail Fehler:", err);
+    // kein 500 – Daten sind gespeichert, Mail ist optional
   }
+
+  res.status(200).json({ message: "Nachricht erfolgreich gesendet!" });
 });
 
 // Static Files
