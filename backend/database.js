@@ -26,6 +26,14 @@ const createTable = async () => {
         erstellt_am TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )
     `);
+
+    await db.query(`
+      CREATE TABLE IF NOT EXISTS admin (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        benutzername VARCHAR(50) NOT NULL,
+        passwort VARCHAR(255) NOT NULL
+      )
+    `);
     console.log("Tabelle bereit!");
   } catch (err) {
     console.error("DB Fehler beim Erstellen der Tabelle:", err);
