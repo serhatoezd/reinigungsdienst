@@ -13,3 +13,10 @@ CREATE TABLE IF NOT EXISTS kontakt (
     nachricht TEXT NOT NULL,
     erstellt_am TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- Tabelle: admin
+CREATE TABLE IF NOT EXISTS admin (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    benutzername VARCHAR(50) NOT NULL,
+    passwort VARCHAR(255) NOT NULL
+);
