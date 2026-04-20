@@ -1,10 +1,11 @@
+// Store all requests
 let alleAnfragen = [];
 
-// Anfragen laden
+// Load requests from API
 async function anfragenLaden() {
   try {
     const res = await fetch("/api/admin/anfragen");
-
+    // Redirect to login if not authenticated
     if (res.status === 401) {
       window.location.href = "/admin/login.html";
       return;
@@ -16,17 +17,16 @@ async function anfragenLaden() {
     console.error("Fehler:", err);
   }
 }
-
-// Tabelle befüllen
+// Render requests in table
 function tabelleAnzeigen(daten) {
   const tbody = document.getElementById("tabelleBody");
-
+  // Show message if no requests
   if (daten.length === 0) {
     tbody.innerHTML =
       '<tr><td colspan="7" class="text-center">Keine Anfragen vorhanden.</td></tr>';
     return;
   }
-
+  // Build table rows
   tbody.innerHTML = daten
     .map(
       (a) => `
@@ -46,7 +46,7 @@ function tabelleAnzeigen(daten) {
     .join("");
 }
 
-// Suche
+// Search filter
 document.getElementById("suche").addEventListener("input", (e) => {
   const suchbegriff = e.target.value.toLowerCase();
   const gefiltert = alleAnfragen.filter(
@@ -57,7 +57,7 @@ document.getElementById("suche").addEventListener("input", (e) => {
   tabelleAnzeigen(gefiltert);
 });
 
-// Löschen
+// Delete request
 async function loeschen(id) {
   if (!confirm("Anfrage wirklich löschen?")) return;
 
@@ -65,7 +65,7 @@ async function loeschen(id) {
     const res = await fetch(`/api/admin/anfragen/${id}`, {
       method: "DELETE",
     });
-
+    // Reload requests after deletion
     if (res.ok) {
       anfragenLaden();
     }
@@ -74,11 +74,11 @@ async function loeschen(id) {
   }
 }
 
-// Logout
+// Logout handler
 document.getElementById("logoutBtn").addEventListener("click", async () => {
   await fetch("/api/admin/logout", { method: "POST" });
   window.location.href = "/admin/login.html";
 });
 
-// Start
+// Initialize dashboard
 anfragenLaden();

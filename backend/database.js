@@ -1,8 +1,8 @@
 import mysql from "mysql2";
 import dotenv from "dotenv";
-
+// Load environment variables
 dotenv.config();
-
+// Create MySQL connection pool
 const db = mysql
   .createPool({
     host: process.env.DB_HOST,
@@ -12,9 +12,10 @@ const db = mysql
   })
   .promise();
 
-// Tabelle erstellen falls nicht vorhanden
+// Create tables if they do not exist
 const createTable = async () => {
   try {
+    // Create contact table
     await db.query(`
       CREATE TABLE IF NOT EXISTS kontakt (
         id INT AUTO_INCREMENT PRIMARY KEY,
@@ -26,7 +27,7 @@ const createTable = async () => {
         erstellt_am TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )
     `);
-
+    // Create admin table
     await db.query(`
       CREATE TABLE IF NOT EXISTS admin (
         id INT AUTO_INCREMENT PRIMARY KEY,
@@ -39,7 +40,7 @@ const createTable = async () => {
     console.error("DB Fehler beim Erstellen der Tabelle:", err);
   }
 };
-
+// Initialize database
 createTable();
 
 export default db;

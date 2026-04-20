@@ -8,13 +8,14 @@ import bcrypt from "bcryptjs";
 import { dirname } from "path";
 import { fileURLToPath } from "url";
 
+// Load environment variables
 dotenv.config();
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Transporter
+// Configure email transporter
 const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
@@ -23,7 +24,7 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-// Middleware
+// Configure middleware
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -36,7 +37,7 @@ app.use(
   }),
 );
 
-// ── Kontakt Route ──────────────────────────────────────────
+// Contact Route
 app.post("/api/kontakt", async (req, res) => {
   const { name, telefon, email, leistung, nachricht } = req.body;
 
@@ -44,6 +45,7 @@ app.post("/api/kontakt", async (req, res) => {
     "INSERT INTO kontakt (name, telefon, email, leistung, nachricht) VALUES (?, ?, ?, ?, ?)";
 
   try {
+    // Save contact request to database
     await db.query(sql, [name, telefon, email, leistung, nachricht]);
   } catch (err) {
     console.error("DB Fehler:", err);
@@ -51,6 +53,7 @@ app.post("/api/kontakt", async (req, res) => {
   }
 
   try {
+    // Send email notification to owner
     await transporter.sendMail({
       from: process.env.MAIL_USER,
       to: process.env.MAIL_TO,
@@ -70,7 +73,8 @@ Nachricht: ${nachricht}
   res.status(200).json({ message: "Nachricht erfolgreich gesendet!" });
 });
 
-// ── Admin Middleware ───────────────────────────────────────
+// Admin Middleware
+// Check if admin is authenticated
 const istEingeloggt = (req, res, next) => {
   if (req.session.admin) {
     next();
@@ -79,11 +83,12 @@ const istEingeloggt = (req, res, next) => {
   }
 };
 
-// ── Admin Login ────────────────────────────────────────────
+// Admin Login
 app.post("/api/admin/login", async (req, res) => {
   const { benutzername, passwort } = req.body;
 
   try {
+    // Check if admin exists in database
     const [rows] = await db.query(
       "SELECT * FROM admin WHERE benutzername = ?",
       [benutzername],
@@ -94,12 +99,13 @@ app.post("/api/admin/login", async (req, res) => {
     }
 
     const admin = rows[0];
+    // Verify password with bcrypt
     const passwortKorrekt = await bcrypt.compare(passwort, admin.passwort);
 
     if (!passwortKorrekt) {
       return res.status(401).json({ message: "Falsche Zugangsdaten" });
     }
-
+    // Set session
     req.session.admin = true;
     res.status(200).json({ message: "Login erfolgreich" });
   } catch (err) {
@@ -108,15 +114,17 @@ app.post("/api/admin/login", async (req, res) => {
   }
 });
 
-// ── Admin Logout ───────────────────────────────────────────
+// Admin Logout
 app.post("/api/admin/logout", (req, res) => {
+  // Destroy session and redirect to login
   req.session.destroy();
   res.status(200).json({ message: "Logout erfolgreich" });
 });
 
-// ── Alle Anfragen abrufen ──────────────────────────────────
+// Get All Requests
 app.get("/api/admin/anfragen", istEingeloggt, async (req, res) => {
   try {
+    // Fetch all contact requests ordered by date
     const [rows] = await db.query(
       "SELECT * FROM kontakt ORDER BY erstellt_am DESC",
     );
@@ -127,10 +135,11 @@ app.get("/api/admin/anfragen", istEingeloggt, async (req, res) => {
   }
 });
 
-// ── Anfrage löschen ────────────────────────────────────────
+// Delete Request
 app.delete("/api/admin/anfragen/:id", istEingeloggt, async (req, res) => {
   const { id } = req.params;
   try {
+    // Delete contact request by ID
     await db.query("DELETE FROM kontakt WHERE id = ?", [id]);
     res.status(200).json({ message: "Anfrage gelöscht" });
   } catch (err) {
@@ -139,10 +148,10 @@ app.delete("/api/admin/anfragen/:id", istEingeloggt, async (req, res) => {
   }
 });
 
-// ── Static Files ───────────────────────────────────────────
+// Static Files
 app.use(express.static(__dirname + "/../frontend"));
 
-// Server starten
+// Start server
 app.listen(PORT, () => {
   console.log(`Server läuft auf Port ${PORT}`);
 });
